@@ -1,20 +1,22 @@
 ---
 kind: pipeline
-type: docker
-name: default
+# type: docker
+name: Run Pipeline
 
 platform:
   os: linux
-  arch: arm64
+  arch: amd64
   
 steps:
-- name: another
+- name: Run Step
   image: alpine
   commands:
-  - echo "Hellos"
-  - sleep 2
-  - echo "Done"
+  - echo "Hello how r u. Yes i am fine"
 
----
-kind: signature
-hmac: F10E2821BBBEA527EA02200352313BC059445190
+
+trigger:
+  ref:
+    - refs/heads/main
+    - refs/tags/**
+    - refs/pull/**   
+
