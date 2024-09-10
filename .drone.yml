@@ -23,11 +23,11 @@ roleRef:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: shobhit-devspace-kubernetes-delegate-account-token
+  name: kubernetes-delegate-account-token
   namespace: shobhit-singh-drone
 type: Opaque
 data:
-  DELEGATE_TOKEN: "NWQ0MDg3MjFkMDEzNDJjMjIwNzUzYjgyYjdkOTgzNTI="
+  DELEGATE_TOKEN: "NDJiOWIzZDk3ZmZiYjg4YjMxZmQ5ZjQxZTIxZjlhMDQ="
 
 ---
 
@@ -38,28 +38,28 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    harness.io/name: shobhit-devspace-kubernetes-delegate
-  name: shobhit-devspace-kubernetes-delegate
+    harness.io/name: kubernetes-delegate
+  name: kubernetes-delegate
   namespace: shobhit-singh-drone
 spec:
   replicas: 1
   minReadySeconds: 120
   selector:
     matchLabels:
-      harness.io/name: shobhit-devspace-kubernetes-delegate
+      harness.io/name: kubernetes-delegate
   template:
     metadata:
       labels:
-        harness.io/name: shobhit-devspace-kubernetes-delegate
+        harness.io/name: kubernetes-delegate
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "3460"
         prometheus.io/path: "/api/metrics"
     spec:
-      terminationGracePeriodSeconds: 600
+      terminationGracePeriodSeconds: 3600
       restartPolicy: Always
       containers:
-      - image: docker.io/harness/delegate:24.02.82308
+      - image: harness/delegate:24.08.83802
         imagePullPolicy: Always
         name: delegate
         securityContext:
@@ -91,18 +91,18 @@ spec:
           failureThreshold: 15
         envFrom:
         - secretRef:
-            name: shobhit-devspace-kubernetes-delegate-account-token
+            name: kubernetes-delegate-account-token
         env:
         - name: JAVA_OPTS
           value: "-Xms64M"
         - name: ACCOUNT_ID
-          value: 1FPMbSjkTF-9FWWHJWdHlQ
+          value: 9UuUfLwaQ-6ZowvbG7qtLQ
         - name: MANAGER_HOST_AND_PORT
-          value: https://satyalingam.pr2.harness.io
+          value: https://app.harness.io/gratis
         - name: DEPLOY_MODE
-          value: KUBERNETES_ONPREM
+          value: KUBERNETES
         - name: DELEGATE_NAME
-          value: shobhit-devspace-kubernetes-delegate
+          value: kubernetes-delegate
         - name: DELEGATE_TYPE
           value: "KUBERNETES"
         - name: DELEGATE_NAMESPACE
@@ -120,7 +120,7 @@ spec:
         - name: CLIENT_TOOLS_DOWNLOAD_DISABLED
           value: "true"
         - name: LOG_STREAMING_SERVICE_URL
-          value: "https://satyalingam.pr2.harness.io/log-service/"
+          value: "https://app.harness.io/gratis/log-service/"
         - name: DELEGATE_RESOURCE_THRESHOLD
           value: ""
         - name: DYNAMIC_REQUEST_HANDLING
@@ -131,15 +131,15 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-   name: shobhit-devspace-kubernetes-delegate-hpa
+   name: kubernetes-delegate-hpa
    namespace: shobhit-singh-drone
    labels:
-       harness.io/name: shobhit-devspace-kubernetes-delegate
+       harness.io/name: kubernetes-delegate
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: shobhit-devspace-kubernetes-delegate
+    name: kubernetes-delegate
   minReplicas: 1
   maxReplicas: 1
   metrics:
@@ -176,7 +176,7 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: shobhit-devspace-kubernetes-delegate-upgrader-cronjob
+  name: kubernetes-delegate-upgrader-cronjob
   namespace: shobhit-singh-drone
 subjects:
   - kind: ServiceAccount
@@ -200,29 +200,29 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: shobhit-devspace-kubernetes-delegate-upgrader-token
+  name: kubernetes-delegate-upgrader-token
   namespace: shobhit-singh-drone
 type: Opaque
 data:
-  UPGRADER_TOKEN: "NWQ0MDg3MjFkMDEzNDJjMjIwNzUzYjgyYjdkOTgzNTI="
+  UPGRADER_TOKEN: "NDJiOWIzZDk3ZmZiYjg4YjMxZmQ5ZjQxZTIxZjlhMDQ="
 
 ---
 
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: shobhit-devspace-kubernetes-delegate-upgrader-config
+  name: kubernetes-delegate-upgrader-config
   namespace: shobhit-singh-drone
 data:
   config.yaml: |
     mode: Delegate
     dryRun: false
-    workloadName: shobhit-devspace-kubernetes-delegate
+    workloadName: kubernetes-delegate
     namespace: shobhit-singh-drone
     containerName: delegate
     delegateConfig:
-      accountId: 1FPMbSjkTF-9FWWHJWdHlQ
-      managerHost: https://satyalingam.pr2.harness.io
+      accountId: 9UuUfLwaQ-6ZowvbG7qtLQ
+      managerHost: https://app.harness.io/gratis
 
 ---
 
@@ -230,8 +230,8 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   labels:
-    harness.io/name: shobhit-devspace-kubernetes-delegate-upgrader-job
-  name: shobhit-devspace-kubernetes-delegate-upgrader-job
+    harness.io/name: kubernetes-delegate-upgrader-job
+  name: kubernetes-delegate-upgrader-job
   namespace: shobhit-singh-drone
 spec:
   schedule: "0 */1 * * *"
@@ -244,16 +244,16 @@ spec:
           serviceAccountName: upgrader-cronjob-sa
           restartPolicy: Never
           containers:
-          - image: docker.io/harness/upgrader:latest
+          - image: harness/upgrader:latest
             name: upgrader
             imagePullPolicy: Always
             envFrom:
             - secretRef:
-                name: shobhit-devspace-kubernetes-delegate-upgrader-token
+                name: kubernetes-delegate-upgrader-token
             volumeMounts:
               - name: config-volume
                 mountPath: /etc/config
           volumes:
             - name: config-volume
               configMap:
-                name: shobhit-devspace-kubernetes-delegate-upgrader-config
+                name: kubernetes-delegate-upgrader-config
