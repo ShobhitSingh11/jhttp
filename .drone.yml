@@ -1,18 +1,18 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: harness-delegate-ng
+  name: shobhit-singh-drone
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: harness-delegate-ng-cluster-admin
+  name: shobhit-singh-drone-cluster-admin
 subjects:
   - kind: ServiceAccount
     name: default
-    namespace: harness-delegate-ng
+    namespace: shobhit-singh-drone
 roleRef:
   kind: ClusterRole
   name: cluster-admin
@@ -24,7 +24,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: shobhit-devspace-kubernetes-delegate-account-token
-  namespace: harness-delegate-ng
+  namespace: shobhit-singh-drone
 type: Opaque
 data:
   DELEGATE_TOKEN: "NWQ0MDg3MjFkMDEzNDJjMjIwNzUzYjgyYjdkOTgzNTI="
@@ -40,7 +40,7 @@ metadata:
   labels:
     harness.io/name: shobhit-devspace-kubernetes-delegate
   name: shobhit-devspace-kubernetes-delegate
-  namespace: harness-delegate-ng
+  namespace: shobhit-singh-drone
 spec:
   replicas: 1
   minReadySeconds: 120
@@ -132,7 +132,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
    name: shobhit-devspace-kubernetes-delegate-hpa
-   namespace: harness-delegate-ng
+   namespace: shobhit-singh-drone
    labels:
        harness.io/name: shobhit-devspace-kubernetes-delegate
 spec:
@@ -162,7 +162,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: upgrader-cronjob
-  namespace: harness-delegate-ng
+  namespace: shobhit-singh-drone
 rules:
   - apiGroups: ["batch", "apps", "extensions"]
     resources: ["cronjobs"]
@@ -177,11 +177,11 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: shobhit-devspace-kubernetes-delegate-upgrader-cronjob
-  namespace: harness-delegate-ng
+  namespace: shobhit-singh-drone
 subjects:
   - kind: ServiceAccount
     name: upgrader-cronjob-sa
-    namespace: harness-delegate-ng
+    namespace: shobhit-singh-drone
 roleRef:
   kind: Role
   name: upgrader-cronjob
@@ -193,7 +193,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: upgrader-cronjob-sa
-  namespace: harness-delegate-ng
+  namespace: shobhit-singh-drone
 
 ---
 
@@ -201,7 +201,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: shobhit-devspace-kubernetes-delegate-upgrader-token
-  namespace: harness-delegate-ng
+  namespace: shobhit-singh-drone
 type: Opaque
 data:
   UPGRADER_TOKEN: "NWQ0MDg3MjFkMDEzNDJjMjIwNzUzYjgyYjdkOTgzNTI="
@@ -212,13 +212,13 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: shobhit-devspace-kubernetes-delegate-upgrader-config
-  namespace: harness-delegate-ng
+  namespace: shobhit-singh-drone
 data:
   config.yaml: |
     mode: Delegate
     dryRun: false
     workloadName: shobhit-devspace-kubernetes-delegate
-    namespace: harness-delegate-ng
+    namespace: shobhit-singh-drone
     containerName: delegate
     delegateConfig:
       accountId: 1FPMbSjkTF-9FWWHJWdHlQ
@@ -232,7 +232,7 @@ metadata:
   labels:
     harness.io/name: shobhit-devspace-kubernetes-delegate-upgrader-job
   name: shobhit-devspace-kubernetes-delegate-upgrader-job
-  namespace: harness-delegate-ng
+  namespace: shobhit-singh-drone
 spec:
   schedule: "0 */1 * * *"
   concurrencyPolicy: Forbid
